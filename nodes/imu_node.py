@@ -218,12 +218,27 @@ for x in range(0, 200):
 rospy.loginfo("Publishing IMU data...")
 #f = open("raw_imu_data.log", 'w')
 
+errcount = 0
 while not rospy.is_shutdown():
+    if (errcount > 10):
+        break
     line = ser.readline()
+    if ((line.find("#YPRAG=") == "") or (line.find("\r\n") == "")): 
+        rospy.logwarn("Bad IMU data or bad sync")
+        errcount = errcount+1
+        continue
+    else:
+        errcount = 0
     line = line.replace("#YPRAG=","")   # Delete "#YPRAG="
     #f.write(line)                     # Write to the output log file
+    line = line.replace("\r\n","")   # Delete "\r\n"
     words = string.split(line,",")    # Fields split
-    if len(words) > 2:
+    if len(words) != 9:
+        rospy.logwarn("Bad IMU data or bad sync")
+        errcount = errcount+1
+        continue
+    else:
+        errcount = 0
         #in AHRS firmware z axis points down, in ROS z axis points up (see REP 103)
         yaw_deg = -float(words[0])
         yaw_deg = yaw_deg + imu_yaw_calibration
