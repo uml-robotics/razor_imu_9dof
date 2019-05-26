@@ -137,6 +137,7 @@ gyro_average_offset_z = rospy.get_param('~gyro_average_offset_z', 0.0)
 rospy.loginfo("Opening %s...", port)
 try:
     ser = serial.Serial(port=port, baudrate=57600, timeout=1)
+    #ser = serial.Serial(port=port, baudrate=57600, timeout=1, rtscts=True, dsrdtr=True) # For compatibility with some virtual serial ports (e.g. created by socat) in Python 2.7
 except serial.serialutil.SerialException:
     rospy.logerr("IMU not found at port "+port + ". Did you specify the correct port in the launch file?")
     #exit
