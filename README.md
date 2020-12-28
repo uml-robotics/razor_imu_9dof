@@ -7,7 +7,7 @@ http://wiki.ros.org/razor_imu_9dof
 
 Install and Configure ROS Package
 ---------------------------------
-1) Install dependencies:
+1) Install dependencies (3D visualization might not work on recent Ubuntu, see https://github.com/KristofRobot/razor_imu_9dof/issues/47):
 
 	$ sudo apt-get install python-visual
 
@@ -41,7 +41,7 @@ Use this version - it emits linear acceleration and angular velocity data requir
 //#define HW__VERSION_CODE 10724 // SparkFun "9DOF Sensor Stick" version "SEN-10724" (HMC5883L magnetometer)
 </pre>
 
-4) Upload Arduino sketch to the Sparkfun 9DOF Razor IMU board
+4) Upload Arduino sketch to the board
 
 
 Configure
@@ -60,13 +60,13 @@ Then, edit ``my_razor.yaml`` as needed
 
 Launch
 ------
-Publisher and 3D visualization:
-
-	$ roslaunch razor_imu_9dof razor-pub-and-display.launch
-
 Publisher only:
 
 	$ roslaunch razor_imu_9dof razor-pub.launch
+
+Publisher and 3D visualization:
+
+	$ roslaunch razor_imu_9dof razor-pub-and-display.launch
 
 Publisher only with diagnostics:
 

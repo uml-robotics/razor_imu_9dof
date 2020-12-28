@@ -101,7 +101,6 @@ default_port='/dev/ttyUSB0'
 port = rospy.get_param('~port', default_port)
 
 #read calibration parameters
-port = rospy.get_param('~port', default_port)
 
 #accelerometer
 accel_x_min = rospy.get_param('~accel_x_min', -250.0)

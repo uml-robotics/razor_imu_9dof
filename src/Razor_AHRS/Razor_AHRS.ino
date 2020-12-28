@@ -268,7 +268,7 @@ boolean output_errors = false;  // true or false
 
 // SENSOR CALIBRATION
 /*****************************************************************/
-// How to calibrate? Read the tutorial at http://dev.qu.tu-berlin.de/projects/sf-razor-9dof-ahrs
+// How to calibrate? Read the tutorial at https://github.com/ptrbrtz/razor-9dof-ahrs/wiki/Tutorial
 // Put MIN/MAX and OFFSET readings for your board here!
 // For the M0, only the extended magnetometer calibration seems to be really necessary if DEBUG__USE_DMP_M0 is set to true...
 // Accelerometer
