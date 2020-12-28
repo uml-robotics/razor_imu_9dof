@@ -94,8 +94,8 @@ imuMsg.linear_acceleration_covariance = [
 
 # read basic information
 port = rospy.get_param('~port', '/dev/ttyUSB0')
-topic_name = rospy.get_param('~topic', 'imu')
-link_name = rospy.get_param('~link_name', 'base_imu_link')
+topic = rospy.get_param('~topic', 'imu')
+frame_id = rospy.get_param('~frame_id', 'base_imu_link')
 
 # read calibration parameters
 
@@ -129,7 +129,7 @@ gyro_average_offset_z = rospy.get_param('~gyro_average_offset_z', 0.0)
 #rospy.loginfo("%s %s %s", str(calibration_magn_use_extended), str(magn_ellipsoid_center), str(magn_ellipsoid_transform[0][0]))
 #rospy.loginfo("%f %f %f", gyro_average_offset_x, gyro_average_offset_y, gyro_average_offset_z)
 
-pub = rospy.Publisher(topic_name, Imu, queue_size=1)
+pub = rospy.Publisher(topic, Imu, queue_size=1)
 srv = Server(imuConfig, reconfig_callback)  # define dynamic_reconfigure callback
 diag_pub = rospy.Publisher('diagnostics', DiagnosticArray, queue_size=1)
 diag_pub_time = rospy.get_time();
@@ -272,7 +272,7 @@ while not rospy.is_shutdown():
     imuMsg.orientation.z = q[2]
     imuMsg.orientation.w = q[3]
     imuMsg.header.stamp= rospy.Time.now()
-    imuMsg.header.frame_id = link_name
+    imuMsg.header.frame_id = frame_id
     imuMsg.header.seq = seq
     seq = seq + 1
     pub.publish(imuMsg)

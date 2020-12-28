@@ -1,8 +1,7 @@
 ## USB port
 port: /dev/ttyUSB0
 topic: imu
-link_name: base_imu_link
-
+frame_id: base_imu_link
 
 ##### Calibration ####
 ### accelerometer
