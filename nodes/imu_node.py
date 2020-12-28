@@ -53,11 +53,6 @@ def reconfig_callback(config, level):
     return config
 
 rospy.init_node("razor_node")
-#We only care about the most recent measurement, i.e. queue_size=1
-pub = rospy.Publisher('imu', Imu, queue_size=1)
-srv = Server(imuConfig, reconfig_callback)  # define dynamic_reconfigure callback
-diag_pub = rospy.Publisher('diagnostics', DiagnosticArray, queue_size=1)
-diag_pub_time = rospy.get_time();
 
 imuMsg = Imu()
 
@@ -97,12 +92,14 @@ imuMsg.linear_acceleration_covariance = [
 0 , 0 , 0.04
 ]
 
-default_port='/dev/ttyUSB0'
-port = rospy.get_param('~port', default_port)
+# read basic information
+port = rospy.get_param('~port', '/dev/ttyUSB0')
+topic_name = rospy.get_param('~topic', 'imu')
+link_name = rospy.get_param('~link_name', 'base_imu_link')
 
-#read calibration parameters
+# read calibration parameters
 
-#accelerometer
+# accelerometer
 accel_x_min = rospy.get_param('~accel_x_min', -250.0)
 accel_x_max = rospy.get_param('~accel_x_max', 250.0)
 accel_y_min = rospy.get_param('~accel_y_min', -250.0)
@@ -131,6 +128,11 @@ gyro_average_offset_z = rospy.get_param('~gyro_average_offset_z', 0.0)
 #rospy.loginfo("%f %f %f %f %f %f", magn_x_min, magn_x_max, magn_y_min, magn_y_max, magn_z_min, magn_z_max)
 #rospy.loginfo("%s %s %s", str(calibration_magn_use_extended), str(magn_ellipsoid_center), str(magn_ellipsoid_transform[0][0]))
 #rospy.loginfo("%f %f %f", gyro_average_offset_x, gyro_average_offset_y, gyro_average_offset_z)
+
+pub = rospy.Publisher(topic_name, Imu, queue_size=1)
+srv = Server(imuConfig, reconfig_callback)  # define dynamic_reconfigure callback
+diag_pub = rospy.Publisher('diagnostics', DiagnosticArray, queue_size=1)
+diag_pub_time = rospy.get_time();
 
 # Check your COM port and baud rate
 rospy.loginfo("Opening %s...", port)
@@ -270,7 +272,7 @@ while not rospy.is_shutdown():
     imuMsg.orientation.z = q[2]
     imuMsg.orientation.w = q[3]
     imuMsg.header.stamp= rospy.Time.now()
-    imuMsg.header.frame_id = 'base_imu_link'
+    imuMsg.header.frame_id = link_name
     imuMsg.header.seq = seq
     seq = seq + 1
     pub.publish(imuMsg)
