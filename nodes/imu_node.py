@@ -154,7 +154,7 @@ rospy.sleep(5) # Sleep for 5 seconds to wait for the board to boot
 
 ### configure board ###
 #stop datastream
-ser.write('#o0' + chr(13))
+ser.write(('#o0').encode("utf-8"))
 
 #discard old input
 #automatic flush - NOT WORKING
@@ -163,60 +163,61 @@ ser.write('#o0' + chr(13))
 discard = ser.readlines() 
 
 #set output mode
-ser.write('#ox' + chr(13)) # To start display angle and sensor reading in text
+ser.write(('#ox').encode("utf-8")) # To start display angle and sensor reading in text
 
 rospy.loginfo("Writing calibration values to razor IMU board...")
 #set calibration values
-ser.write('#caxm' + str(accel_x_min) + chr(13))
-ser.write('#caxM' + str(accel_x_max) + chr(13))
-ser.write('#caym' + str(accel_y_min) + chr(13))
-ser.write('#cayM' + str(accel_y_max) + chr(13))
-ser.write('#cazm' + str(accel_z_min) + chr(13))
-ser.write('#cazM' + str(accel_z_max) + chr(13))
+ser.write(('#caxm' + str(accel_x_min)).encode("utf-8"))
+ser.write(('#caxM' + str(accel_x_max)).encode("utf-8"))
+ser.write(('#caym' + str(accel_y_min)).encode("utf-8"))
+ser.write(('#cayM' + str(accel_y_max)).encode("utf-8"))
+ser.write(('#cazm' + str(accel_z_min)).encode("utf-8"))
+ser.write(('#cazM' + str(accel_z_max)).encode("utf-8"))
 
 if (not calibration_magn_use_extended):
-    ser.write('#cmxm' + str(magn_x_min) + chr(13))
-    ser.write('#cmxM' + str(magn_x_max) + chr(13))
-    ser.write('#cmym' + str(magn_y_min) + chr(13))
-    ser.write('#cmyM' + str(magn_y_max) + chr(13))
-    ser.write('#cmzm' + str(magn_z_min) + chr(13))
-    ser.write('#cmzM' + str(magn_z_max) + chr(13))
+    ser.write(('#cmxm' + str(magn_x_min)).encode("utf-8"))
+    ser.write(('#cmxM' + str(magn_x_max)).encode("utf-8"))
+    ser.write(('#cmym' + str(magn_y_min)).encode("utf-8"))
+    ser.write(('#cmyM' + str(magn_y_max)).encode("utf-8"))
+    ser.write(('#cmzm' + str(magn_z_min)).encode("utf-8"))
+    ser.write(('#cmzM' + str(magn_z_max)).encode("utf-8"))
 else:
-    ser.write('#ccx' + str(magn_ellipsoid_center[0]) + chr(13))
-    ser.write('#ccy' + str(magn_ellipsoid_center[1]) + chr(13))
-    ser.write('#ccz' + str(magn_ellipsoid_center[2]) + chr(13))
-    ser.write('#ctxX' + str(magn_ellipsoid_transform[0][0]) + chr(13))
-    ser.write('#ctxY' + str(magn_ellipsoid_transform[0][1]) + chr(13))
-    ser.write('#ctxZ' + str(magn_ellipsoid_transform[0][2]) + chr(13))
-    ser.write('#ctyX' + str(magn_ellipsoid_transform[1][0]) + chr(13))
-    ser.write('#ctyY' + str(magn_ellipsoid_transform[1][1]) + chr(13))
-    ser.write('#ctyZ' + str(magn_ellipsoid_transform[1][2]) + chr(13))
-    ser.write('#ctzX' + str(magn_ellipsoid_transform[2][0]) + chr(13))
-    ser.write('#ctzY' + str(magn_ellipsoid_transform[2][1]) + chr(13))
-    ser.write('#ctzZ' + str(magn_ellipsoid_transform[2][2]) + chr(13))
+    ser.write(('#ccx' + str(magn_ellipsoid_center[0])).encode("utf-8"))
+    ser.write(('#ccy' + str(magn_ellipsoid_center[1])).encode("utf-8"))
+    ser.write(('#ccz' + str(magn_ellipsoid_center[2])).encode("utf-8"))
+    ser.write(('#ctxX' + str(magn_ellipsoid_transform[0][0])).encode("utf-8"))
+    ser.write(('#ctxY' + str(magn_ellipsoid_transform[0][1])).encode("utf-8"))
+    ser.write(('#ctxZ' + str(magn_ellipsoid_transform[0][2])).encode("utf-8"))
+    ser.write(('#ctyX' + str(magn_ellipsoid_transform[1][0])).encode("utf-8"))
+    ser.write(('#ctyY' + str(magn_ellipsoid_transform[1][1])).encode("utf-8"))
+    ser.write(('#ctyZ' + str(magn_ellipsoid_transform[1][2])).encode("utf-8"))
+    ser.write(('#ctzX' + str(magn_ellipsoid_transform[2][0])).encode("utf-8"))
+    ser.write(('#ctzY' + str(magn_ellipsoid_transform[2][1])).encode("utf-8"))
+    ser.write(('#ctzZ' + str(magn_ellipsoid_transform[2][2])).encode("utf-8"))
 
-ser.write('#cgx' + str(gyro_average_offset_x) + chr(13))
-ser.write('#cgy' + str(gyro_average_offset_y) + chr(13))
-ser.write('#cgz' + str(gyro_average_offset_z) + chr(13))
+ser.write(('#cgx' + str(gyro_average_offset_x)).encode("utf-8"))
+ser.write(('#cgy' + str(gyro_average_offset_y)).encode("utf-8"))
+ser.write(('#cgz' + str(gyro_average_offset_z)).encode("utf-8"))
 
 #print calibration values for verification by user
 ser.flushInput()
-ser.write('#p' + chr(13))
+ser.write(('#p').encode("utf-8"))
 calib_data = ser.readlines()
 calib_data_print = "Printing set calibration values:\r\n"
-for line in calib_data:
+for row in calib_data:
+    line = bytearray(row).decode("utf-8")
     calib_data_print += line
 rospy.loginfo(calib_data_print)
 
 #start datastream
-ser.write('#o1' + chr(13))
+ser.write(('#o1').encode("utf-8"))
 
 #automatic flush - NOT WORKING
 #ser.flushInput()  #discard old input, still in invalid format
 #flush manually, as above command is not working - it breaks the serial connection
 rospy.loginfo("Flushing first 200 IMU entries...")
 for x in range(0, 200):
-    line = ser.readline()
+    line = bytearray(ser.readline()).decode("utf-8")
 rospy.loginfo("Publishing IMU data...")
 #f = open("raw_imu_data.log", 'w')
 
@@ -224,7 +225,7 @@ errcount = 0
 while not rospy.is_shutdown():
     if (errcount > 10):
         break
-    line = ser.readline()
+    line = bytearray(ser.readline()).decode("utf-8")
     if ((line.find("#YPRAG=") == "") or (line.find("\r\n") == "")): 
         rospy.logwarn("Bad IMU data or bad sync")
         errcount = errcount+1
@@ -234,7 +235,7 @@ while not rospy.is_shutdown():
     line = line.replace("#YPRAG=","")   # Delete "#YPRAG="
     #f.write(line)                     # Write to the output log file
     line = line.replace("\r\n","")   # Delete "\r\n"
-    words = string.split(line,",")    # Fields split
+    words = line.split(",")    # Fields split
     if len(words) != 9:
         rospy.logwarn("Bad IMU data or bad sync")
         errcount = errcount+1

@@ -28,7 +28,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import rospy
-from visual import *
+try:
+	from visual import *
+except:
+	from vpython import *
 import math
 import wx
 
@@ -51,7 +54,8 @@ rospy.on_shutdown(shutdown_hook)
 
 # Main scene
 scene=display(title="9DOF Razor IMU Main Screen")
-scene.range=(1.3,1.3,1.3)
+#scene.range=(1.3,1.3,1.3)
+scene.range=1.3
 scene.forward = (1,0,-0.25)
 # Change reference axis (x,y,z) - z is up
 scene.up=(0,0,1)
@@ -60,7 +64,8 @@ scene.height=500
 
 # Second scene (Roll, Pitch, Yaw)
 scene2 = display(title='9DOF Razor IMU Roll, Pitch, Yaw',x=550, y=0, width=500, height=500,center=(0,0,0), background=(0,0,0))
-scene2.range=(1,1,1)
+#scene2.range=(1,1,1)
+scene2.range=1
 scene2.select()
 #Roll, Pitch, Yaw
 #Default reference, i.e. x runs right, y runs up, z runs backward (out of screen)
@@ -160,9 +165,15 @@ def processIMU_message(imuMsg):
     angVelLabel.text = str(round(imuMsg.angular_velocity.x, precision)) + " / " + str(round(imuMsg.angular_velocity.y, precision)) + " / " + str(round(imuMsg.angular_velocity.z, precision))
 
     #check for align key press - if pressed, next refresh will be aligned
-    if scene.kb.keys: # event waiting to be processed?
-        s = scene.kb.getkey() # get keyboard info
-        if s == 'a':
+    try:
+        if scene.kb.keys: # event waiting to be processed?
+            s = scene.kb.getkey() # get keyboard info
+            if s == 'a':
+                #align key pressed - align
+                yaw_offset += -yaw
+    except:
+        k = keysdown()
+        if 'a' in k:
             #align key pressed - align
             yaw_offset += -yaw
 

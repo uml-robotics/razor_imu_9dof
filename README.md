@@ -7,9 +7,10 @@ http://wiki.ros.org/razor_imu_9dof
 
 Install and Configure ROS Package
 ---------------------------------
-1) Install dependencies (3D visualization might not work on recent Ubuntu, see https://github.com/KristofRobot/razor_imu_9dof/issues/47):
+1) Install dependencies (for 3D visualization):
 
-	$ sudo apt-get install python-visual
+	$ sudo apt-get install python-visual # Does not work from Ubuntu 18.04, see https://github.com/KristofRobot/razor_imu_9dof/issues/47
+	$ sudo apt-get install python3-pip python3-wxgtk4.0 ; pip3 install vpython # From Ubuntu 20.04
 
 2) Download code:
 
@@ -17,6 +18,7 @@ Install and Configure ROS Package
 	$ git clone https://github.com/KristofRobot/razor_imu_9dof.git
 	$ cd ..
 	$ catkin_make
+	$ cd src/razor_imu_9dof/nodes ; wget https://www.glowscript.org/docs/VPythonDocs/VPtoGS.py ; python3 VPtoGS.py ; cp -f Converted/display_3D_visualization.py display_3D_visualization.py ; cd ../../.. # For 3D visualization, from Ubuntu 20.04
 
 
 Install Arduino firmware
