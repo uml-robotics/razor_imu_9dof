@@ -9,18 +9,21 @@ Install and Configure ROS Package
 ---------------------------------
 1) Install dependencies (for 3D visualization):
 
-    $ sudo apt-get install python-visual # For Ubuntu 16.04 and before
-    # For Ubuntu 18.04, install https://github.com/lebarsfa/visual/tree/numpy-port, or see https://github.com/KristofRobot/razor_imu_9dof/issues/47
-    $ sudo apt-get install python3-pip python3-wxgtk4.0 ; pip3 install vpython # From Ubuntu 20.04
+```bash
+sudo apt-get install python-visual # For Ubuntu 16.04 and before
+# For Ubuntu 18.04, install https://github.com/lebarsfa/visual/tree/bionic, or see https://github.com/KristofRobot/razor_imu_9dof/issues/47
+sudo apt-get install python3-pip python3-wxgtk4.0 ; pip3 install vpython # From Ubuntu 20.04
+```
 
 2) Download code:
 
-    $ cd ~/catkin_workspace/src
-    $ git clone https://github.com/KristofRobot/razor_imu_9dof.git
-    $ cd ..
-    $ catkin_make
-    $ cd src/razor_imu_9dof/nodes ; wget https://www.glowscript.org/docs/VPythonDocs/VPtoGS.py ; python3 VPtoGS.py ; cp -f Converted/display_3D_visualization.py display_3D_visualization.py ; cd ../../.. # For 3D visualization, from Ubuntu 20.04
-
+```bash
+cd ~/catkin_workspace/src
+git clone https://github.com/KristofRobot/razor_imu_9dof.git
+cd ..
+catkin_make
+cd src/razor_imu_9dof/nodes ; wget https://www.glowscript.org/docs/VPythonDocs/VPtoGS.py ; python3 VPtoGS.py ; cp -f Converted/display_3D_visualization.py display_3D_visualization.py ; cd ../../.. # For 3D visualization, from Ubuntu 20.04
+```
 
 Install Arduino firmware
 -------------------------
@@ -32,7 +35,7 @@ Use this version - it emits linear acceleration and angular velocity data requir
 
 3) Select your hardware here by uncommenting the right line in ``src/Razor_AHRS/Razor_AHRS.ino``, e.g.
 
-<pre>
+```cpp
 // HARDWARE OPTIONS
 /*****************************************************************/
 // Select your hardware here by uncommenting one line!
@@ -44,7 +47,7 @@ Use this version - it emits linear acceleration and angular velocity data requir
 //#define HW__VERSION_CODE 10183 // SparkFun "9DOF Sensor Stick" version "SEN-10183" (HMC5843 magnetometer)
 //#define HW__VERSION_CODE 10321 // SparkFun "9DOF Sensor Stick" version "SEN-10321" (HMC5843 magnetometer)
 //#define HW__VERSION_CODE 10724 // SparkFun "9DOF Sensor Stick" version "SEN-10724" (HMC5883L magnetometer)
-</pre>
+```
 
 4) Upload Arduino sketch to the board
 
@@ -58,8 +61,10 @@ In its default configuration, ``razor_imu_9dof`` expects a yaml config file ``my
 An example``razor.yaml`` file is provided.
 Copy that file to ``my_razor.yaml`` as follows:
 
-    $ roscd razor_imu_9dof/config
-    $ cp razor.yaml my_razor.yaml
+```bash
+roscd razor_imu_9dof/config
+cp razor.yaml my_razor.yaml
+```
 
 Then, edit ``my_razor.yaml`` as needed
 
@@ -67,19 +72,27 @@ Launch
 ------
 Publisher only:
 
-	$ roslaunch razor_imu_9dof razor-pub.launch
+```bash
+roslaunch razor_imu_9dof razor-pub.launch
+```
 
 Publisher and 3D visualization:
 
-	$ roslaunch razor_imu_9dof razor-pub-and-display.launch
+```bash
+roslaunch razor_imu_9dof razor-pub-and-display.launch
+```
 
 Publisher only with diagnostics:
 
-	$ roslaunch razor_imu_9dof razor-pub-diags.launch
+```bash
+roslaunch razor_imu_9dof razor-pub-diags.launch
+```
 
 3D visualization only:
 
-	$ roslaunch razor_imu_9dof razor-display.launch
+```bash
+roslaunch razor_imu_9dof razor-display.launch
+```
 
 
 Calibrate
@@ -99,8 +112,10 @@ it is possible to dynamically reconfigure the yaw calibration.
 
 1) Run:
 
-    $ rosrun rqt_reconfigure rqt_reconfigure 
-    
+```bash
+rosrun rqt_reconfigure rqt_reconfigure 
+```
+  
 2) Select ``imu_node``. 
 
 3) Change the slider to move the calibration +/- 10 degrees. 
