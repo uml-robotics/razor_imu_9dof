@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 2.8.3...3.0.2)
 project(razor_imu_9dof)
 
 find_package(catkin REQUIRED COMPONENTS dynamic_reconfigure)

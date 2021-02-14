@@ -22,7 +22,8 @@ cd ~/catkin_workspace/src
 git clone https://github.com/KristofRobot/razor_imu_9dof.git
 cd ..
 catkin_make
-cd src/razor_imu_9dof/nodes ; wget https://www.glowscript.org/docs/VPythonDocs/VPtoGS.py ; python3 VPtoGS.py ; cp -f Converted/display_3D_visualization.py display_3D_visualization.py ; cd ../../.. # For 3D visualization, from Ubuntu 20.04
+# For 3D visualization, from Ubuntu 20.04
+cd src/razor_imu_9dof/nodes ; wget https://www.glowscript.org/docs/VPythonDocs/VPtoGS.py ; python3 VPtoGS.py ; cp -f Converted/display_3D_visualization.py display_3D_visualization.py ; cd ../../..
 ```
 
 Install Arduino firmware
