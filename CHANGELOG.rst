@@ -2,6 +2,10 @@
 Changelog for package razor_imu_9dof
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.0 (28-12-2020)
+------------------
+* Adding firmware support for SPX-15846 and DEV-16832 (OpenLog Artemis) (lebarsfa)
+
 1.2.0 (20-12-2017)
 ------------------
 * Adding firmware support for SEN-14001 (9DoF Razor IMU M0) (lebarsfa)

@@ -53,11 +53,6 @@ def reconfig_callback(config, level):
     return config
 
 rospy.init_node("razor_node")
-#We only care about the most recent measurement, i.e. queue_size=1
-pub = rospy.Publisher('imu', Imu, queue_size=1)
-srv = Server(imuConfig, reconfig_callback)  # define dynamic_reconfigure callback
-diag_pub = rospy.Publisher('diagnostics', DiagnosticArray, queue_size=1)
-diag_pub_time = rospy.get_time();
 
 imuMsg = Imu()
 
@@ -97,13 +92,14 @@ imuMsg.linear_acceleration_covariance = [
 0 , 0 , 0.04
 ]
 
-default_port='/dev/ttyUSB0'
-port = rospy.get_param('~port', default_port)
+# read basic information
+port = rospy.get_param('~port', '/dev/ttyUSB0')
+topic = rospy.get_param('~topic', 'imu')
+frame_id = rospy.get_param('~frame_id', 'base_imu_link')
 
-#read calibration parameters
-port = rospy.get_param('~port', default_port)
+# read calibration parameters
 
-#accelerometer
+# accelerometer
 accel_x_min = rospy.get_param('~accel_x_min', -250.0)
 accel_x_max = rospy.get_param('~accel_x_max', 250.0)
 accel_y_min = rospy.get_param('~accel_y_min', -250.0)
@@ -133,10 +129,16 @@ gyro_average_offset_z = rospy.get_param('~gyro_average_offset_z', 0.0)
 #rospy.loginfo("%s %s %s", str(calibration_magn_use_extended), str(magn_ellipsoid_center), str(magn_ellipsoid_transform[0][0]))
 #rospy.loginfo("%f %f %f", gyro_average_offset_x, gyro_average_offset_y, gyro_average_offset_z)
 
+pub = rospy.Publisher(topic, Imu, queue_size=1)
+srv = Server(imuConfig, reconfig_callback)  # define dynamic_reconfigure callback
+diag_pub = rospy.Publisher('diagnostics', DiagnosticArray, queue_size=1)
+diag_pub_time = rospy.get_time();
+
 # Check your COM port and baud rate
 rospy.loginfo("Opening %s...", port)
 try:
     ser = serial.Serial(port=port, baudrate=57600, timeout=1)
+    #ser = serial.Serial(port=port, baudrate=57600, timeout=1, rtscts=True, dsrdtr=True) # For compatibility with some virtual serial ports (e.g. created by socat) in Python 2.7
 except serial.serialutil.SerialException:
     rospy.logerr("IMU not found at port "+port + ". Did you specify the correct port in the launch file?")
     #exit
@@ -152,7 +154,7 @@ rospy.sleep(5) # Sleep for 5 seconds to wait for the board to boot
 
 ### configure board ###
 #stop datastream
-ser.write('#o0' + chr(13))
+ser.write(('#o0').encode("utf-8"))
 
 #discard old input
 #automatic flush - NOT WORKING
@@ -161,69 +163,85 @@ ser.write('#o0' + chr(13))
 discard = ser.readlines() 
 
 #set output mode
-ser.write('#ox' + chr(13)) # To start display angle and sensor reading in text
+ser.write(('#ox').encode("utf-8")) # To start display angle and sensor reading in text
 
 rospy.loginfo("Writing calibration values to razor IMU board...")
 #set calibration values
-ser.write('#caxm' + str(accel_x_min) + chr(13))
-ser.write('#caxM' + str(accel_x_max) + chr(13))
-ser.write('#caym' + str(accel_y_min) + chr(13))
-ser.write('#cayM' + str(accel_y_max) + chr(13))
-ser.write('#cazm' + str(accel_z_min) + chr(13))
-ser.write('#cazM' + str(accel_z_max) + chr(13))
+ser.write(('#caxm' + str(accel_x_min)).encode("utf-8"))
+ser.write(('#caxM' + str(accel_x_max)).encode("utf-8"))
+ser.write(('#caym' + str(accel_y_min)).encode("utf-8"))
+ser.write(('#cayM' + str(accel_y_max)).encode("utf-8"))
+ser.write(('#cazm' + str(accel_z_min)).encode("utf-8"))
+ser.write(('#cazM' + str(accel_z_max)).encode("utf-8"))
 
 if (not calibration_magn_use_extended):
-    ser.write('#cmxm' + str(magn_x_min) + chr(13))
-    ser.write('#cmxM' + str(magn_x_max) + chr(13))
-    ser.write('#cmym' + str(magn_y_min) + chr(13))
-    ser.write('#cmyM' + str(magn_y_max) + chr(13))
-    ser.write('#cmzm' + str(magn_z_min) + chr(13))
-    ser.write('#cmzM' + str(magn_z_max) + chr(13))
+    ser.write(('#cmxm' + str(magn_x_min)).encode("utf-8"))
+    ser.write(('#cmxM' + str(magn_x_max)).encode("utf-8"))
+    ser.write(('#cmym' + str(magn_y_min)).encode("utf-8"))
+    ser.write(('#cmyM' + str(magn_y_max)).encode("utf-8"))
+    ser.write(('#cmzm' + str(magn_z_min)).encode("utf-8"))
+    ser.write(('#cmzM' + str(magn_z_max)).encode("utf-8"))
 else:
-    ser.write('#ccx' + str(magn_ellipsoid_center[0]) + chr(13))
-    ser.write('#ccy' + str(magn_ellipsoid_center[1]) + chr(13))
-    ser.write('#ccz' + str(magn_ellipsoid_center[2]) + chr(13))
-    ser.write('#ctxX' + str(magn_ellipsoid_transform[0][0]) + chr(13))
-    ser.write('#ctxY' + str(magn_ellipsoid_transform[0][1]) + chr(13))
-    ser.write('#ctxZ' + str(magn_ellipsoid_transform[0][2]) + chr(13))
-    ser.write('#ctyX' + str(magn_ellipsoid_transform[1][0]) + chr(13))
-    ser.write('#ctyY' + str(magn_ellipsoid_transform[1][1]) + chr(13))
-    ser.write('#ctyZ' + str(magn_ellipsoid_transform[1][2]) + chr(13))
-    ser.write('#ctzX' + str(magn_ellipsoid_transform[2][0]) + chr(13))
-    ser.write('#ctzY' + str(magn_ellipsoid_transform[2][1]) + chr(13))
-    ser.write('#ctzZ' + str(magn_ellipsoid_transform[2][2]) + chr(13))
+    ser.write(('#ccx' + str(magn_ellipsoid_center[0])).encode("utf-8"))
+    ser.write(('#ccy' + str(magn_ellipsoid_center[1])).encode("utf-8"))
+    ser.write(('#ccz' + str(magn_ellipsoid_center[2])).encode("utf-8"))
+    ser.write(('#ctxX' + str(magn_ellipsoid_transform[0][0])).encode("utf-8"))
+    ser.write(('#ctxY' + str(magn_ellipsoid_transform[0][1])).encode("utf-8"))
+    ser.write(('#ctxZ' + str(magn_ellipsoid_transform[0][2])).encode("utf-8"))
+    ser.write(('#ctyX' + str(magn_ellipsoid_transform[1][0])).encode("utf-8"))
+    ser.write(('#ctyY' + str(magn_ellipsoid_transform[1][1])).encode("utf-8"))
+    ser.write(('#ctyZ' + str(magn_ellipsoid_transform[1][2])).encode("utf-8"))
+    ser.write(('#ctzX' + str(magn_ellipsoid_transform[2][0])).encode("utf-8"))
+    ser.write(('#ctzY' + str(magn_ellipsoid_transform[2][1])).encode("utf-8"))
+    ser.write(('#ctzZ' + str(magn_ellipsoid_transform[2][2])).encode("utf-8"))
 
-ser.write('#cgx' + str(gyro_average_offset_x) + chr(13))
-ser.write('#cgy' + str(gyro_average_offset_y) + chr(13))
-ser.write('#cgz' + str(gyro_average_offset_z) + chr(13))
+ser.write(('#cgx' + str(gyro_average_offset_x)).encode("utf-8"))
+ser.write(('#cgy' + str(gyro_average_offset_y)).encode("utf-8"))
+ser.write(('#cgz' + str(gyro_average_offset_z)).encode("utf-8"))
 
 #print calibration values for verification by user
 ser.flushInput()
-ser.write('#p' + chr(13))
+ser.write(('#p').encode("utf-8"))
 calib_data = ser.readlines()
 calib_data_print = "Printing set calibration values:\r\n"
-for line in calib_data:
+for row in calib_data:
+    line = bytearray(row).decode("utf-8")
     calib_data_print += line
 rospy.loginfo(calib_data_print)
 
 #start datastream
-ser.write('#o1' + chr(13))
+ser.write(('#o1').encode("utf-8"))
 
 #automatic flush - NOT WORKING
 #ser.flushInput()  #discard old input, still in invalid format
 #flush manually, as above command is not working - it breaks the serial connection
 rospy.loginfo("Flushing first 200 IMU entries...")
 for x in range(0, 200):
-    line = ser.readline()
+    line = bytearray(ser.readline()).decode("utf-8")
 rospy.loginfo("Publishing IMU data...")
 #f = open("raw_imu_data.log", 'w')
 
+errcount = 0
 while not rospy.is_shutdown():
-    line = ser.readline()
+    if (errcount > 10):
+        break
+    line = bytearray(ser.readline()).decode("utf-8")
+    if ((line.find("#YPRAG=") == "") or (line.find("\r\n") == "")): 
+        rospy.logwarn("Bad IMU data or bad sync")
+        errcount = errcount+1
+        continue
+    else:
+        errcount = 0
     line = line.replace("#YPRAG=","")   # Delete "#YPRAG="
     #f.write(line)                     # Write to the output log file
-    words = string.split(line,",")    # Fields split
-    if len(words) > 2:
+    line = line.replace("\r\n","")   # Delete "\r\n"
+    words = line.split(",")    # Fields split
+    if len(words) != 9:
+        rospy.logwarn("Bad IMU data or bad sync")
+        errcount = errcount+1
+        continue
+    else:
+        errcount = 0
         #in AHRS firmware z axis points down, in ROS z axis points up (see REP 103)
         yaw_deg = -float(words[0])
         yaw_deg = yaw_deg + imu_yaw_calibration
@@ -255,7 +273,7 @@ while not rospy.is_shutdown():
     imuMsg.orientation.z = q[2]
     imuMsg.orientation.w = q[3]
     imuMsg.header.stamp= rospy.Time.now()
-    imuMsg.header.frame_id = 'base_imu_link'
+    imuMsg.header.frame_id = frame_id
     imuMsg.header.seq = seq
     seq = seq + 1
     pub.publish(imuMsg)
