@@ -30,7 +30,7 @@ Install Arduino firmware
 -------------------------
 1) For SPX-15846 and DEV-16832 (OpenLog Artemis), you will need to follow the same instructions as for the ``OLA_IMU_Basics.ino`` sample from https://github.com/sparkfun/OpenLog_Artemis (i.e. get the drivers from https://learn.sparkfun.com/tutorials/how-to-install-ch340-drivers, install SparkFun Apollo3 boards in Arduino IDE as in https://learn.sparkfun.com/tutorials/installing-board-definitions-in-the-arduino-ide (add https://raw.githubusercontent.com/sparkfun/Arduino_Boards/master/IDE_Board_Manager/package_sparkfun_index.json to `File` → `Preferences` → `Additional Board Manager URLs`) and ensure you select `SparkFun Apollo3` → `SparkFun RedBoard Artemis ATP` as the board and install SparkFun ICM 20948 IMU Arduino library as in https://learn.sparkfun.com/tutorials/installing-an-arduino-library). For SEN-14001 (9DoF Razor IMU M0), you will need to follow the same instructions as for the default firmware on https://learn.sparkfun.com/tutorials/9dof-razor-imu-m0-hookup-guide and use an updated version of SparkFun_MPU-9250-DMP_Arduino_Library from https://github.com/lebarsfa/SparkFun_MPU-9250-DMP_Arduino_Library (an updated version of the default firmware is also available on https://github.com/lebarsfa/9DOF_Razor_IMU).
 
-2) Open ``src/Razor_AHRS/Razor_AHRS.ino`` in Arduino IDE. Note: this is a modified version
+2) Open ``src/Razor_AHRS/Razor_AHRS.ino`` in Arduino IDE. Note: this is a [modified version](https://github.com/lebarsfa/razor-9dof-ahrs)
 of Peter Bartz' original Arduino code (see https://github.com/ptrbrtz/razor-9dof-ahrs). 
 Use this version - it emits linear acceleration and angular velocity data required by the ROS Imu message
 
