@@ -142,7 +142,7 @@ try:
 except serial.serialutil.SerialException:
     rospy.logerr("IMU not found at port "+port + ". Did you specify the correct port in the launch file?")
     #exit
-    sys.exit(0)
+    sys.exit(2)
 
 roll=0
 pitch=0
@@ -226,12 +226,10 @@ while not rospy.is_shutdown():
     if (errcount > 10):
         break
     line = bytearray(ser.readline()).decode("utf-8")
-    if ((line.find("#YPRAG=") == "") or (line.find("\r\n") == "")): 
+    if ((line.find("#YPRAG=") == -1) or (line.find("\r\n") == -1)): 
         rospy.logwarn("Bad IMU data or bad sync")
         errcount = errcount+1
         continue
-    else:
-        errcount = 0
     line = line.replace("#YPRAG=","")   # Delete "#YPRAG="
     #f.write(line)                     # Write to the output log file
     line = line.replace("\r\n","")   # Delete "\r\n"
@@ -298,4 +296,8 @@ while not rospy.is_shutdown():
         diag_pub.publish(diag_arr)
         
 ser.close
+
 #f.close
+
+if (errcount > 10):
+    sys.exit(10)
