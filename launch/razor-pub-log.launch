@@ -5,6 +5,6 @@
   </node> 
 
   <node pkg="rosbag" type="record" name="data_logger" 
-    args="record /clock /imu">
+    args="record -a">
   </node>
 </launch>
